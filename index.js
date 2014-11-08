@@ -27,10 +27,12 @@ function addPipe(read) {
     return read
 
   read.pipe = read.pipe || function (reader) {
-    if('function' != typeof reader)
+    if('function' != typeof reader && 'function' != typeof reader.sink)
       throw new Error('must pipe to reader')
-    return addPipe(reader(read))
+    var pipe = addPipe(reader.sink ? reader.sink(read) : reader(read))
+    return reader.source || pipe;
   }
+  
   read.type = 'Source'
   return read
 }
